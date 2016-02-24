@@ -1,0 +1,54 @@
+CREATE TABLE tanque (
+  id INTEGER NOT NULL PRIMARY KEY,
+  descricao VARCHAR(30) NOT NULL
+);
+
+CREATE GENERATOR tanque_gen;
+SET GENERATOR tanque_gen TO 0;
+
+CREATE OR ALTER TRIGGER set_tanque_id FOR tanque
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+    if (new.id is null) then
+    new.id = gen_id(tanque_gen, 1);
+END;
+
+CREATE TABLE bomba (
+  id INTEGER NOT NULL PRIMARY KEY,
+  descricao VARCHAR(30) NOT NULL,
+  id_tanque INTEGER NOT NULL,
+  FOREIGN KEY (id_tanque) REFERENCES tanque(id)
+);
+
+CREATE GENERATOR bomba_gen;
+SET GENERATOR bomba_gen TO 0;
+
+CREATE OR ALTER TRIGGER set_bomba_id FOR bomba
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+    if (new.id is null) then
+    new.id = gen_id(bomba_gen, 1);
+END;
+
+CREATE TABLE abastecimento (
+  id INTEGER NOT NULL PRIMARY KEY,
+  quantidade DECIMAL(5,3) NOT NULL,
+  valor DECIMAL(5,3) NOT NULL,
+  valor_imposto DECIMAL(5,3) NOT NULL,
+  data date default CURRENT_DATE,
+  id_bomba INTEGER NOT NULL,
+  FOREIGN KEY (id_bomba) REFERENCES bomba(id)
+);
+
+CREATE GENERATOR abastecimento_gen;
+SET GENERATOR abastecimento_gen TO 0;
+
+CREATE TRIGGER set_abastecimento_id FOR abastecimento
+ACTIVE BEFORE INSERT POSITION 0
+AS
+BEGIN
+    if (new.id is null) then
+    new.id = gen_id(abastecimento_gen, 1);
+END;
